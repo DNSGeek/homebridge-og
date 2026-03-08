@@ -1,0 +1,40 @@
+{
+    "author": {
+        "name": "Samer Albahra"
+    },
+    "bundleDependencies": false,
+    "dependencies": {},
+    "deprecated": false,
+    "description": "Homebridge garage plugin for OpenGarage",
+    "devDependencies": {
+        "eslint": "^4.9.0",
+        "mocha": "^10.0.0"
+    },
+    "directories": {},
+    "engines": {
+        "homebridge": ">=1.6.0",
+        "node": ">=18.20.4"
+    },
+    "keywords": [
+        "homebridge-plugin",
+        "OpenGarage"
+    ],
+    "license": "MIT",
+    "main": "index.js",
+    "maintainers": [
+        {
+            "name": "chickenmilk",
+            "email": "chickenmilk@yandex.com"
+        },
+        {
+            "name": "Samer Albahra",
+            "email": "salbahra@gmail.com"
+        }
+    ],
+    "name": "homebridge-og",
+    "optionalDependencies": {},
+    "scripts": {
+        "test": "mocha"
+    },
+    "version": "3.2.0"
+}

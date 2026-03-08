@@ -43,19 +43,18 @@ Update your config.json configuration file. See the example below.
 ### Sample config.json
 
 ```json
+{
+  "accessories": [
     {
-        "accessories":
-        [
-            {
-                "accessory": "OpenGarage",
-                "name": "Garage",
-                "ip": "192.168.0.4",
-                "key": "YourPassword",
-                "openCloseDurationSecs": 22,
-                "pollFrequencySecs": 60
-            }
-        ]
+      "accessory": "OpenGarage",
+      "name": "Garage",
+      "ip": "192.168.0.4",
+      "key": "YourPassword",
+      "openCloseDurationSecs": 22,
+      "pollFrequencySecs": 60
     }
+  ]
+}
 ```
 
 ## NOTES

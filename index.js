@@ -16,6 +16,7 @@ module.exports = function (homebridge) {
       const openGarageApi = new OpenGarageApi({
         ip: config.ip,
         key: config.key,
+        requestTimeoutMs: config.requestTimeoutMs,
       });
       const OpenGarage = OpenGarageModule(log, config, {
         Service,
@@ -25,7 +26,7 @@ module.exports = function (homebridge) {
         clearTimeout,
         Date,
       });
-      this.openGarage = new OpenGarage(config.name, true);
+      this.openGarage = new OpenGarage(config.name);
     }
 
     getServices() {

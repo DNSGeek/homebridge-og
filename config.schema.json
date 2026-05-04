@@ -1,0 +1,61 @@
+{
+  "pluginAlias": "OpenGarage",
+  "pluginType": "accessory",
+  "singular": false,
+  "headerDisplay": "Homebridge plugin for [OpenGarage](https://opengarage.io).",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "required": true,
+        "default": "Garage",
+        "description": "Name of the accessory as shown in HomeKit."
+      },
+      "ip": {
+        "title": "IP Address or Hostname",
+        "type": "string",
+        "required": true,
+        "format": "hostname",
+        "description": "IP address or hostname of your OpenGarage device."
+      },
+      "key": {
+        "title": "Device Key",
+        "type": "string",
+        "required": true,
+        "description": "Device key (password) configured on your OpenGarage."
+      },
+      "openCloseDurationSecs": {
+        "title": "Open/Close Duration (seconds)",
+        "type": "integer",
+        "default": 25,
+        "minimum": 5,
+        "maximum": 120,
+        "description": "Time within which the door should reliably finish opening or closing, including any warning beeps."
+      },
+      "pollFrequencySecs": {
+        "title": "Poll Frequency (seconds)",
+        "type": "integer",
+        "default": 60,
+        "minimum": 5,
+        "maximum": 3600,
+        "description": "How often to poll OpenGarage for state changes."
+      },
+      "vehicleSensorName": {
+        "title": "Vehicle Sensor Name",
+        "type": "string",
+        "default": "Vehicle Present",
+        "description": "Name of the occupancy sensor exposed for vehicle presence."
+      },
+      "requestTimeoutMs": {
+        "title": "HTTP Request Timeout (ms)",
+        "type": "integer",
+        "default": 10000,
+        "minimum": 1000,
+        "maximum": 60000,
+        "description": "Timeout for HTTP requests to the OpenGarage device."
+      }
+    }
+  }
+}

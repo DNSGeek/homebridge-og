@@ -2,43 +2,46 @@
 
 Homebridge plugin for [OpenGarage](https://opengarage.io).
 This plugin is a modified version of [homebridge-loxone-garage](https://www.npmjs.com/package/homebridge-loxone-garage)
-made to work with OpenGarage
+made to work with OpenGarage.
 
-This repo was forked from https://www.npmjs.com/package/homebridge-og and updated to work with HomeBridge v2.
+This repo was forked from https://www.npmjs.com/package/homebridge-og and updated to work with Homebridge v2.
+
+## Requirements
+
+- OpenGarage firmware 1.0.8 or later
+- Node.js 18.20.4+ (20, 22, or 24 also supported)
+- Homebridge 1.6+ or Homebridge 2.x
 
 ## Installation
 
-This plugin only works with OpenGarage Firmware 1.0.8 or later.
-
-You must have NodeJS `v8.1.4` or later installed as `homebridge-og` depends on JavaScript features introduced at that point. Check your node version:
+Install via Homebridge Config UI X (search for `homebridge-og`), or from the command line:
 
 ```
-node --version
+npm install -g homebridge-og
 ```
 
-You need [Homebridge](https://github.com/nfarina/homebridge) installed and configured. This plugin was developed against Homebridge `0.4.43`.
+To install from source:
 
 ```
-npm install -g homebridge
-```
-
-Install this plugin from source:
-
-```
-git clone ...
+git clone https://github.com/dnsgeek/homebridge-og.git
 cd homebridge-og
 npm pack
-sudo npm install -g homebridge-og-3.0.0.tgz
+sudo npm install -g homebridge-og-*.tgz
 ```
 
 ## Configuration
 
-Update your config.json configuration file. See the example below.
+Use the Homebridge Config UI X plugin settings page, or edit `config.json` manually.
 
-- `ip` - The host name or IP address of your OpenGarage device
-- `key` - The password to control your OpenGarage device
-- `openCloseDurationSecs` - The amount of time within which an open/close transition should reliably complete (and OpenGarage will sense the new door state), including the OpenGarage warning beeps.
-- `pollFrequencySecs` - How often to poll OpenGarage for state changes. This will enable state updates for the garage door when not controlled via this homebridge plugin.
+| Field                   | Required | Default            | Description                                                                                                          |
+| ----------------------- | -------- | ------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `name`                  | yes      | —                  | Accessory name shown in HomeKit.                                                                                     |
+| `ip`                    | yes      | —                  | Hostname or IP address of your OpenGarage device.                                                                    |
+| `key`                   | yes      | —                  | Device key (password) configured on the OpenGarage.                                                                  |
+| `openCloseDurationSecs` | no       | `25`               | Time within which an open/close transition should reliably complete (and the device will sense the new door state). |
+| `pollFrequencySecs`     | no       | `60`               | How often to poll OpenGarage for state changes.                                                                      |
+| `vehicleSensorName`     | no       | `Vehicle Present`  | Name of the occupancy sensor exposed for vehicle presence.                                                           |
+| `requestTimeoutMs`      | no       | `10000`            | Timeout for HTTP requests to the OpenGarage device.                                                                  |
 
 ### Sample config.json
 
@@ -57,10 +60,16 @@ Update your config.json configuration file. See the example below.
 }
 ```
 
-## NOTES
+## Notes
 
-1. Change the IP in the example to the IP or hostname of your OpenGarage.
-1. Be sure to change the "YourPassword" part to the password used for your OpenGarage.
-1. Measure how long it takes for your garage door to close after triggering the state change using OpenGarage, including
-   the warning beeps if applicable. Add a few seconds and set the value `openCloseDurationSecs` accordingly.
-1. Enjoy telling Siri to open and close your Garage as well as receiving push notifications on state change.
+1. Set `ip` to the IP or hostname of your OpenGarage device.
+2. Set `key` to the device key configured on your OpenGarage.
+3. Measure how long it takes for your garage door to close after triggering the state change (including any warning beeps), add a few seconds, and set `openCloseDurationSecs` accordingly.
+4. Tell Siri to open or close your garage and receive push notifications on state changes.
+
+## Development
+
+```
+npm install
+npm test
+```

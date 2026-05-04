@@ -7,14 +7,13 @@
   "deprecated": false,
   "description": "Homebridge garage plugin for OpenGarage",
   "devDependencies": {
-    "eslint": "^4.9.0",
     "mocha": "^10.0.0"
   },
   "directories": {},
   "engines": {
-    "homebridge": "^1.6.0 || ^2.0.0-beta.0",
+    "homebridge": "^1.6.0 || ^2.0.0-beta.0 || ^2.0.0",
     "node": "^18.20.4 || ^20.15.1 || ^22 || ^24"
-},
+  },
   "keywords": [
     "homebridge-plugin",
     "OpenGarage"
@@ -34,7 +33,7 @@
   "name": "homebridge-og",
   "optionalDependencies": {},
   "scripts": {
-    "test": "mocha"
+    "test": "mocha tests/"
   },
-  "version": "3.2.2"
+  "version": "3.3.0"
 }

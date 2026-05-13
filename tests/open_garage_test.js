@@ -204,13 +204,48 @@ describe("OpenGarage", function () {
   });
 
   describe("#constructor", () => {
-    it("throws an error if last poll result was an error", async () => {
+    it("throws an error if no successful poll has happened yet", async () => {
+      // Replace mock to fail and construct a fresh accessory so the
+      // constructor's initial poll fails too.
+      mockOpenGarageApi.getState = () =>
+        Promise.reject(new Error("HTTP ERROR"));
+      const FailingOpenGarage = OpenGarageModule(
+        MockLog,
+        {},
+        {
+          openGarageApi: mockOpenGarageApi,
+          Service: Service,
+          Characteristic: Characteristic,
+          setTimeout: MockSetTimeout,
+          clearTimeout: MockClearTimeout,
+          Date: MockDate,
+        },
+      );
+      const failing = new FailingOpenGarage("garage");
+      const failingDoorState = failing.garageService.getCharacteristic(
+        Characteristic.CurrentDoorState,
+      );
+      MockSetTimeout.invoke(failing.pollTimer);
+      await eventually(() => {
+        assert.throws(() => failingDoorState.triggerGetSync());
+      });
+    });
+
+    it("keeps reporting the last known state when a poll transiently fails", async () => {
+      MockSetTimeout.invoke(openGarage.pollTimer);
+      await eventually(() => assert.equal(openGarage.isClosed(), true));
+
+      // After at least one good poll, transient errors should not flip the
+      // reported state to "unknown" — HomeKit keeps seeing the cached value.
       mockOpenGarageApi.getState = () =>
         Promise.reject(new Error("HTTP ERROR"));
       MockSetTimeout.invoke(openGarage.pollTimer);
-      await eventually(() => {
-        assert.throws(() => currentDoorState.triggerGetSync());
-      });
+      await eventually(() =>
+        assert.equal(
+          currentDoorState.triggerGetSync(),
+          Characteristic.CurrentDoorState.CLOSED,
+        ),
+      );
     });
 
     it("polls the status and propagates values to Home", async () => {
@@ -226,14 +261,24 @@ describe("OpenGarage", function () {
         targetDoorState.value,
       );
 
+      // First poll seeing the new state arms the debounce but does not yet
+      // propagate the change to HomeKit.
       const pollTimer = openGarage.pollTimer;
       mockOpenGarageApi.isClosed = false;
       MockSetTimeout.invoke(pollTimer);
 
       assert.notEqual(pollTimer, openGarage.pollTimer);
 
+      await eventually(() => assert.equal(openGarage.isClosed(), false));
+      assert.equal(
+        Characteristic.CurrentDoorState.CLOSED,
+        currentDoorState.value,
+      );
+
+      // A second confirming poll propagates the change.
+      MockSetTimeout.invoke(openGarage.pollTimer);
+
       await eventually(() => {
-        assert.equal(openGarage.isClosed(), false);
         assert.equal(
           Characteristic.CurrentDoorState.OPEN,
           currentDoorState.value,
@@ -243,6 +288,38 @@ describe("OpenGarage", function () {
           targetDoorState.value,
         );
       });
+    });
+
+    it("ignores a single transient sensor glitch", async () => {
+      // Two consecutive open polls settle the reported state to OPEN.
+      mockOpenGarageApi.isClosed = false;
+      MockSetTimeout.invoke(openGarage.pollTimer);
+      await eventually(() => assert.equal(openGarage.isClosed(), false));
+      MockSetTimeout.invoke(openGarage.pollTimer);
+      await eventually(() => {
+        assert.equal(
+          Characteristic.CurrentDoorState.OPEN,
+          currentDoorState.value,
+        );
+      });
+
+      // One bad poll reports closed — must not propagate.
+      mockOpenGarageApi.isClosed = true;
+      MockSetTimeout.invoke(openGarage.pollTimer);
+      await eventually(() => assert.equal(openGarage.isClosed(), true));
+      assert.equal(
+        Characteristic.CurrentDoorState.OPEN,
+        currentDoorState.value,
+      );
+
+      // Reading recovers to open — still open in HomeKit, no flicker.
+      mockOpenGarageApi.isClosed = false;
+      MockSetTimeout.invoke(openGarage.pollTimer);
+      await eventually(() => assert.equal(openGarage.isClosed(), false));
+      assert.equal(
+        Characteristic.CurrentDoorState.OPEN,
+        currentDoorState.value,
+      );
     });
 
     it("sends the command to open the garage door and polls after duration", async () => {

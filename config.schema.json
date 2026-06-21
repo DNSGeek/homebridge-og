@@ -55,6 +55,22 @@
         "minimum": 1000,
         "maximum": 60000,
         "description": "Timeout for HTTP requests to the OpenGarage device."
+      },
+      "errorThreshold": {
+        "title": "Error Threshold (consecutive failures before reboot)",
+        "type": "integer",
+        "default": 5,
+        "minimum": 1,
+        "maximum": 100,
+        "description": "Number of consecutive polling errors before a reboot command is sent to the device."
+      },
+      "rebootRetryIntervalSecs": {
+        "title": "Reboot Retry Interval (seconds)",
+        "type": "integer",
+        "default": 30,
+        "minimum": 10,
+        "maximum": 300,
+        "description": "How long to wait between reboot attempts if the device does not respond to the reboot command."
       }
     }
   }

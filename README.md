@@ -33,15 +33,18 @@ sudo npm install -g homebridge-og-*.tgz
 
 Use the Homebridge Config UI X plugin settings page, or edit `config.json` manually.
 
-| Field                   | Required | Default           | Description                                                                                                         |
-| ----------------------- | -------- | ----------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `name`                  | yes      | —                 | Accessory name shown in HomeKit.                                                                                    |
-| `ip`                    | yes      | —                 | Hostname or IP address of your OpenGarage device.                                                                   |
-| `key`                   | yes      | —                 | Device key (password) configured on the OpenGarage.                                                                 |
-| `openCloseDurationSecs` | no       | `25`              | Time within which an open/close transition should reliably complete (and the device will sense the new door state). |
-| `pollFrequencySecs`     | no       | `60`              | How often to poll OpenGarage for state changes.                                                                     |
-| `vehicleSensorName`     | no       | `Vehicle Present` | Name of the occupancy sensor exposed for vehicle presence.                                                          |
-| `requestTimeoutMs`      | no       | `10000`           | Timeout for HTTP requests to the OpenGarage device.                                                                 |
+| Field                     | Required | Default           | Description                                                                                                                                    |
+| ------------------------- | -------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                    | yes      | —                 | Accessory name shown in HomeKit.                                                                                                               |
+| `ip`                      | yes      | —                 | Hostname or IP address of your OpenGarage device.                                                                                              |
+| `key`                     | yes      | —                 | Device key (password) configured on the OpenGarage.                                                                                            |
+| `openCloseDurationSecs`   | no       | `25`              | Time within which an open/close transition should reliably complete (and the device will sense the new door state).                            |
+| `pollFrequencySecs`       | no       | `60`              | How often to poll OpenGarage for state changes.                                                                                                |
+| `stateDebounceSecs`       | no       | `60`              | How long an unexpected door state change must persist before it is reported to HomeKit. See [Spurious notifications](#spurious-notifications). |
+| `vehicleSensorName`       | no       | `Vehicle Present` | Name of the occupancy sensor exposed for vehicle presence.                                                                                     |
+| `requestTimeoutMs`        | no       | `10000`           | Timeout for HTTP requests to the OpenGarage device.                                                                                            |
+| `errorThreshold`          | no       | `5`               | Consecutive polling failures before a reboot command is sent to the device.                                                                    |
+| `rebootRetryIntervalSecs` | no       | `30`              | How long to wait between reboot attempts while the device stays unresponsive.                                                                  |
 
 ### Sample config.json
 
@@ -66,6 +69,26 @@ Use the Homebridge Config UI X plugin settings page, or edit `config.json` manua
 2. Set `key` to the device key configured on your OpenGarage.
 3. Measure how long it takes for your garage door to close after triggering the state change (including any warning beeps), add a few seconds, and set `openCloseDurationSecs` accordingly.
 4. Tell Siri to open or close your garage and receive push notifications on state changes.
+
+### Spurious notifications
+
+OpenGarage senses the door with a distance sensor, and a single bad reading can
+look like the door closed and reopened. HomeKit turns each of those into a push
+notification, so a door left open for a while can produce a stream of
+"closed" / "open" pairs.
+
+Two things keep that quiet:
+
+- The plugin only pushes a value to HomeKit when it actually differs from what
+  HomeKit was last told, so routine polling never generates notifications.
+- A door state change the plugin did not ask for has to hold for
+  `stateDebounceSecs` across at least two readings before it is reported.
+  Opening or closing the door from HomeKit is reported immediately.
+
+If you still see spurious pairs, raise `stateDebounceSecs`. The cost is that a
+door opened or closed by remote or wall button takes that much longer to show up
+in the Home app. Lowering `pollFrequencySecs` alongside it keeps reporting
+responsive while still requiring the change to persist.
 
 ## Development
 

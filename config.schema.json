@@ -42,6 +42,14 @@
         "maximum": 3600,
         "description": "How often to poll OpenGarage for state changes."
       },
+      "stateDebounceSecs": {
+        "title": "State Debounce (seconds)",
+        "type": "integer",
+        "default": 60,
+        "minimum": 0,
+        "maximum": 600,
+        "description": "How long an unexpected door state change must persist before it is reported to HomeKit. Raise this if a flaky distance sensor produces spurious open/closed notifications; lower it for faster reporting of doors operated by remote or wall button. Changes you make from HomeKit are always reported immediately."
+      },
       "vehicleSensorName": {
         "title": "Vehicle Sensor Name",
         "type": "string",
